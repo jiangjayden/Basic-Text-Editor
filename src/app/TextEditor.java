@@ -26,17 +26,21 @@ public class TextEditor {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //closes program properly not just the window
         frame.setLayout(new BorderLayout());
 
+        //create area to write and display text
         textArea = new JTextArea(20,60);
         frame.add(textArea, BorderLayout.NORTH);
 
+        //Scroll pane for when text in the text area gets too big
         JScrollPane scrollPane = new JScrollPane(textArea);
         frame.add(scrollPane, BorderLayout.CENTER);
 
+        //Options to be displayed
         JMenuBar menuBar = new JMenuBar();
         frame.add(menuBar, BorderLayout.NORTH);
 
-        JMenu menu = new JMenu("File");
-        menuBar.add(menu);
+        //Create a "File" option to be added onto the menu
+        JMenu fileOptions = new JMenu("File");
+        menuBar.add(fileOptions);
 
         frame.setVisible(true); //makes everything in the JFrame visible
 
@@ -77,19 +81,21 @@ public class TextEditor {
         });
 
         //Add options to the file menu to form a dropdown
-        menu.add(openFile);
-        menu.add(saveAs);
-        menu.add(saveFile);
-        menu.add(closeFile);
+        fileOptions.add(openFile);
+        fileOptions.add(saveAs);
+        fileOptions.add(saveFile);
+        fileOptions.add(closeFile);
 
     }
 
+    //Method to open the file
     public void openFile() {
         try {
             JFileChooser fc = new JFileChooser();
             // filters for .txt files so the user does not open any other type of file
             FileFilter txtFilter = new FileNameExtensionFilter("Plain Text", "txt");
             fc.setFileFilter(txtFilter);
+
             fc.setDialogTitle("Select a Text File to open");
             fc.showOpenDialog(null);
 
@@ -101,6 +107,7 @@ public class TextEditor {
                 return;
             }
 
+            //Display the selected file onto the text area
             BufferedReader br = new BufferedReader(new FileReader(currentFile));
             textArea.read(br,null); //reads the selected file onto the screen
             br.close();
@@ -112,17 +119,20 @@ public class TextEditor {
         }
     }
 
+    //Method to save a new file
     public void saveAs() {
         try {
             JFileChooser fc = new JFileChooser();
             // filters for .txt files so the user does not open any other type of file
             FileFilter txtFilter = new FileNameExtensionFilter("Plain Text", "txt");
             fc.setFileFilter(txtFilter);
+
             fc.setDialogTitle("Save new file");
             fc.showSaveDialog(null);
 
+            //create new file for contents to be saved in
             currentFile = fc.getSelectedFile();
-            FileWriter fw = new FileWriter(currentFile+".txt");
+            FileWriter fw = new FileWriter(currentFile);
             BufferedWriter bw = new BufferedWriter(fw);
             textArea.write(bw);
             bw.close();
@@ -134,8 +144,11 @@ public class TextEditor {
         }
     }
 
+    //Method to save the file
     public void saveFile() {
         try {
+            //Check if the file exist
+            //if not alert the user and call the saveAs method to create a new file for it to be saved in
             if(currentFile == null){
                 JOptionPane.showMessageDialog(null,"File Does not Exist \nSave new File","Error",JOptionPane.ERROR_MESSAGE);
                 saveAs();
@@ -151,17 +164,20 @@ public class TextEditor {
         }
     }
 
+    //Method to close the file
     public void closeFile() {
+        //Check if their is a file to be closed
         if(currentFile == null){
             JOptionPane.showMessageDialog(null,"Failed to Close \nNo file opened","Error",JOptionPane.ERROR_MESSAGE);
             return;
         }
         try{
+            //Give the user an option to save before closing the file
             int option = JOptionPane.showConfirmDialog(null, "Save before you close?","Save?",JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION){
                 saveFile();
             }
-
+            //resets / clears the text editor
             textArea.setText("");
             currentFile = null;
             frame.setTitle(TITLE);
